@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="hj">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>hj</title>
+<style>
+:root{color-scheme:light;--bg:#E9EDF2;--surface:#FFFFFF;--ink:#1D2633;--muted:#5F6B7C;--line:#D3DAE3;--accent:#2F4A7A;--on-accent:#FFFFFF;
+--m1:#D64545;--m2:#EE8A3C;--m3:#F2CC4A;--m4:#8CC8EA;--m5:#4CAF6A}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#121820;--surface:#1C2430;--ink:#E6EBF1;--muted:#97A3B3;--line:#2E3946;--accent:#8FB0E8;--on-accent:#121820}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 -apple-system,system-ui,sans-serif;
+padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 32px);max-width:640px;margin-inline:auto}
+h1{font-family:ui-rounded,-apple-system,system-ui,sans-serif;font-size:30px;margin:12px 0 2px}
+h2{font-family:ui-rounded,-apple-system,system-ui,sans-serif;font-size:20px;margin:0 0 10px}
+.band{display:flex;gap:3px;height:48px;align-items:flex-end;margin:10px 0 4px}
+.band span{flex:1;border-radius:3px;background:var(--line);min-height:6px}
+.hint{font-size:14px;color:var(--muted);margin:4px 0}
+section{background:var(--surface);border-radius:18px;padding:16px;margin:16px 0}
+textarea{width:100%;min-height:120px;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px;width:100%}
+.moods{display:flex;gap:6px;margin:12px 0}
+.moods button{flex:1;padding:11px 0;border-radius:12px;border:3px solid transparent;font:inherit;font-size:13px;color:#fff}
+.moods button.light{color:#1D2633}
+.moods button[aria-pressed=true]{border-color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:15px}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.primary{width:100%;margin-top:14px;padding:13px;border:0;border-radius:12px;background:var(--accent);color:var(--on-accent);font:inherit;font-weight:600}
+.secondary{padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:none;color:var(--ink);font:inherit}
+.row{display:flex;gap:8px;margin:8px 0}
+.entry{border-left:5px solid var(--line);padding:6px 0 6px 12px;margin:14px 0}
+.entry p{margin:4px 0;white-space:pre-wrap}
+.meta{font-size:13px;color:var(--muted)}
+.del{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;padding:4px 0;text-decoration:underline}
+.banner{background:var(--m3);color:#1D2633;border-radius:14px;padding:12px 14px;margin:12px 0}
+.last{font-weight:600;margin:6px 0 0}
+details summary{font-weight:600;font-family:ui-rounded,-apple-system,system-ui,sans-serif;font-size:18px}
+.cat{border-top:1px solid var(--line);padding:10px 0}
+.msg{font-size:14px;margin-top:8px}
+.cal{margin:14px 0 6px}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.calhead strong{font-family:ui-rounded,-apple-system,system-ui,sans-serif}
+.calhead button{background:none;border:0;color:var(--ink);font-size:24px;padding:2px 14px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.grid .wd{font-size:12px;color:var(--muted)}
+.grid button{aspect-ratio:1;border:0;border-radius:10px;background:none;color:var(--ink);font:inherit;font-size:15px;padding:0}
+.grid button.has{color:#fff}
+.grid button.lightday{color:#1D2633}
+.grid button.today{font-weight:700;text-decoration:underline}
+.grid button[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:-3px}
+.dayline{display:flex;justify-content:space-between;align-items:center;margin:8px 0 0}
+.dayhead{font-family:ui-rounded,-apple-system,system-ui,sans-serif;font-weight:700;margin:20px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<h1>hj</h1>
+<div class="band" id="band" aria-label="Stimmung der letzten 30 Tage"></div>
+<p class="hint">Deine Stimmung der letzten 30 Tage</p>
+<div id="warn"></div>
+
+<section>
+<h2>Wie geht's dir?</h2>
+<textarea id="text" placeholder="Tipp auf das Mikrofon der Tastatur und sprich einfach los."></textarea>
+<div class="moods" id="moods"></div>
+<div class="chips" id="tod"></div>
+<p class="hint">Tageszeit wird automatisch gesetzt. Antippen zum Ändern.</p>
+<div class="chips" id="draftChips"></div>
+<p class="hint">Kategorien werden anhand deiner Stichworte vorgeschlagen. Antippen zum Ändern.</p>
+<button class="primary" id="saveBtn">Eintrag speichern</button>
+<div class="msg" id="saveMsg"></div>
+</section>
+
+<section>
+<h2>Einträge</h2>
+<input id="q" type="search" placeholder="Suchen, z. B. Kopfschmerzen">
+<div class="row"><select id="fMood"></select><select id="fCat"></select><select id="fTod"></select></div>
+<div class="cal" id="cal"></div>
+<div id="dayline"></div>
+<div id="last"></div>
+<div id="list"></div>
+</section>
+
+<section>
+<details><summary>Kategorien</summary>
+<p class="hint">Stichworte mit Komma trennen. Kommt eins im Text vor, wird die Kategorie vorgeschlagen.</p>
+<div id="cats"></div>
+<div class="row"><input id="newCat" placeholder="Neue Kategorie"><button class="secondary" id="addCat">Anlegen</button></div>
+</details>
+</section>
+
+<section>
+<details id="backup"><summary>Sichern und laden</summary>
+<p class="hint">Die Sicherung wird mit deinem Passwort verschlüsselt. Ohne Passwort lässt sie sich nicht öffnen, auch nicht von dir. Speichere die Datei in iCloud Drive.</p>
+<input id="pw" type="password" placeholder="Passwort (mind. 8 Zeichen)" autocomplete="new-password">
+<div class="row"><button class="secondary" id="exportBtn">Verschlüsselt sichern</button>
+<button class="secondary" id="importBtn">Sicherung laden</button></div>
+<input id="file" type="file" accept=".json,application/json" hidden>
+<div class="msg" id="backupMsg"></div>
+</details>
+</section>
+
+<script>
+const KEY='tagebuch-v1';
+const TODS=[{v:'morgens',l:'Morgens'},{v:'mittags',l:'Mittags'},{v:'abends',l:'Abends'}];
+const todOf=t=>{const h=new Date(t).getHours();return h>=5&&h<11?'morgens':h>=11&&h<17?'mittags':'abends'};
+const todLabel=v=>(TODS.find(x=>x.v===v)||{}).l;
+const MOODS=[{v:1,l:'Mies'},{v:2,l:'Schlecht',light:1},{v:3,l:'Okay',light:1},{v:4,l:'Gut',light:1},{v:5,l:'Super',light:1}];
+const DEFAULT_CATS=[
+ {name:'Kopfschmerzen',kw:['kopfschmerz','kopfweh','migräne','schädel']},
+ {name:'Brain Fog',kw:['brain fog','benebelt','nebel im kopf','konzentration','vergesslich']},
+ {name:'Auge',kw:['auge','augen','verschwommen','sehstörung','flimmern','sehen']},
+ {name:'Schwindel',kw:['schwindel','schwindelig','schwummrig','drehschwindel','taumelig']},
+ {name:'Tinnitus',kw:['tinnitus','tinitus','ohrgeräusch','ohrensausen','pfeifen im ohr','piepen im ohr','rauschen im ohr','klingeln im ohr']},
+ {name:'Ernährung',kw:['ernährung','gegessen','essen','frühstück','mittagessen','abendessen','müsli','weizen','zucker','kaffee','alkohol','getrunken','snack','hunger']},
+ {name:'Müdigkeit',kw:['müde','erschöpft','schlapp','kraftlos']},
+ {name:'Schlaf',kw:['schlaf','geschlafen','wach gelegen','aufgewacht']},
+ {name:'Stress',kw:['stress','gestresst','druck','angespannt']},
+ {name:'Bewegung',kw:['sport','gelaufen','spaziergang','training','rad']}
+];
+let storageOk=true;
+try{localStorage.setItem('_t','1');localStorage.removeItem('_t')}catch(e){storageOk=false}
+let db=null;
+try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!db)db={entries:[],cats:DEFAULT_CATS,lastExport:null};
+// Neue Standard-Kategorien auch in bestehende Daten übernehmen (gelöschte bleiben gelöscht)
+{const known=db.knownCats||[];let changed=!db.knownCats;
+ for(const d of DEFAULT_CATS)if(!known.includes(d.name)&&!db.cats.some(c=>c.name.toLowerCase()===d.name.toLowerCase())){db.cats.push(d);changed=true}
+ db.knownCats=DEFAULT_CATS.map(d=>d.name);if(changed)try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+const save=()=>{if(storageOk)try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+const $=id=>document.getElementById(id);
+function el(tag,props={},kids=[]){const e=document.createElement(tag);Object.assign(e,props);for(const k of [].concat(kids))if(k!=null)e.append(k);return e}
+const moodColor=v=>`var(--m${v})`;
+const dayKey=t=>{const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+const fmt=t=>new Date(t).toLocaleString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+function rel(t){const a=new Date();a.setHours(0,0,0,0);const b=new Date(t);b.setHours(0,0,0,0);const n=Math.round((a-b)/864e5);return n===0?'heute':n===1?'gestern':`vor ${n} Tagen`}
+const matches=(text,cat)=>{const t=text.toLowerCase();return [cat.name,...cat.kw].some(k=>k&&t.includes(k.toLowerCase()))};
+
+// Entwurf
+let draftMood=null;let draftTod=null;
+function renderTod(){const box=$('tod');box.replaceChildren();const cur=draftTod||todOf(Date.now());
+ for(const t of TODS){const b=el('button',{className:'chip',textContent:t.l});b.setAttribute('aria-pressed',cur===t.v);b.onclick=()=>{draftTod=t.v;renderTod()};box.append(b)}}
+const manual=new Map();
+function draftCats(){const t=$('text').value;return db.cats.filter(c=>manual.has(c.name)?manual.get(c.name):matches(t,c)).map(c=>c.name)}
+function renderMoods(){const box=$('moods');box.replaceChildren();for(const m of MOODS){
+ const b=el('button',{textContent:m.l,className:m.light?'light':''});b.style.background=moodColor(m.v);
+ b.setAttribute('aria-pressed',draftMood===m.v);b.onclick=()=>{draftMood=draftMood===m.v?null:m.v;renderMoods()};box.append(b)}}
+function renderDraftChips(){const sel=draftCats();const box=$('draftChips');box.replaceChildren();for(const c of db.cats){
+ const on=sel.includes(c.name);const b=el('button',{className:'chip',textContent:c.name});b.setAttribute('aria-pressed',on);
+ b.onclick=()=>{manual.set(c.name,!on);renderDraftChips()};box.append(b)}}
+$('text').addEventListener('input',renderDraftChips);
+$('saveBtn').onclick=()=>{const text=$('text').value.trim();
+ if(!text&&!draftMood){$('saveMsg').textContent='Schreib etwas oder wähle eine Stimmung.';return}
+ db.entries.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts:Date.now(),tod:draftTod||todOf(Date.now()),text,mood:draftMood,cats:draftCats()});
+ save();$('text').value='';draftMood=null;draftTod=null;manual.clear();$('saveMsg').textContent='Gespeichert.';
+ setTimeout(()=>$('saveMsg').textContent='',2000);renderAll()};
+
+// Stimmungsband
+function renderBand(){const box=$('band');box.replaceChildren();for(let i=29;i>=0;i--){
+ const d=new Date();d.setDate(d.getDate()-i);const k=dayKey(d);
+ const ms=db.entries.filter(e=>e.mood&&dayKey(e.ts)===k).map(e=>e.mood);const s=el('span');
+ if(ms.length){const avg=ms.reduce((a,b)=>a+b,0)/ms.length;s.style.height=(avg/5*100)+'%';s.style.background=moodColor(Math.round(avg));
+  s.title=d.toLocaleDateString('de-DE')+': '+MOODS[Math.round(avg)-1].l}
+ box.append(s)}}
+
+// Filter und Liste
+function renderFilters(){const fm=$('fMood'),fc=$('fCat'),ft=$('fTod');const vm=fm.value,vc=fc.value,vt=ft.value;
+ ft.replaceChildren(el('option',{value:'',textContent:'Jede Tageszeit'}),...TODS.map(t=>el('option',{value:t.v,textContent:t.l})));ft.value=vt;
+ fm.replaceChildren(el('option',{value:'',textContent:'Jede Stimmung'}),el('option',{value:'low',textContent:'Mies oder schlecht'}),...MOODS.map(m=>el('option',{value:m.v,textContent:m.l})));
+ fc.replaceChildren(el('option',{value:'',textContent:'Alle Kategorien'}),...db.cats.map(c=>el('option',{value:c.name,textContent:c.name})));
+ fm.value=vm;fc.value=vc}
+function renderList(){const q=$('q').value.trim().toLowerCase(),fm=$('fMood').value,fc=$('fCat').value,ft=$('fTod').value;
+ const res=db.entries.filter(e=>{
+  if(fm==='low'&&!(e.mood&&e.mood<=2))return false;if(fm&&fm!=='low'&&e.mood!=fm)return false;
+  if(fc&&!e.cats.includes(fc))return false;if(selDay&&dayKey(e.ts)!==selDay)return false;if(ft&&(e.tod||todOf(e.ts))!==ft)return false;
+  if(q&&!(e.text.toLowerCase().includes(q)||e.cats.some(c=>c.toLowerCase().includes(q))))return false;return true}).sort((a,b)=>b.ts-a.ts);
+ $('last').replaceChildren(); if((q||fc||fm)&&res.length)$('last').append(el('p',{className:'last',textContent:`Zuletzt ${rel(res[0].ts)}, insgesamt ${res.length}× gefunden`}));
+ const box=$('list');box.replaceChildren();
+ if(!res.length){box.append(el('p',{className:'hint',textContent:db.entries.length?'Keine Treffer. Probier ein anderes Stichwort.':'Noch keine Einträge. Schreib oben deinen ersten.'}));return}
+ let lastDay=null;for(const e of res){const dk=dayKey(e.ts);if(dk!==lastDay){lastDay=dk;box.append(el('div',{className:'dayhead',textContent:new Date(e.ts).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}))}
+  const meta=[todLabel(e.tod||todOf(e.ts))+', '+new Date(e.ts).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}),e.mood?MOODS[e.mood-1].l:null,...e.cats].filter(Boolean).join(', ');
+  const d=el('div',{className:'entry'},[el('div',{className:'meta',textContent:meta}),e.text?el('p',{textContent:e.text}):null,
+   el('button',{className:'del',textContent:'Löschen',onclick:()=>{if(confirm('Diesen Eintrag löschen?')){db.entries=db.entries.filter(x=>x.id!==e.id);save();renderAll()}}})]);
+  if(e.mood)d.style.borderLeftColor=moodColor(e.mood);box.append(d)}}
+['q','fMood','fCat','fTod'].forEach(id=>$(id).addEventListener('input',renderList));
+
+// Kalender
+let calMonth=new Date();calMonth.setDate(1);let selDay=null;
+function renderCal(){const box=$('cal');box.replaceChildren();
+ const y=calMonth.getFullYear(),m=calMonth.getMonth();
+ const prev=el('button',{textContent:'‹',ariaLabel:'Vorheriger Monat',onclick:()=>{calMonth=new Date(y,m-1,1);renderCal()}});
+ const next=el('button',{textContent:'›',ariaLabel:'Nächster Monat',onclick:()=>{calMonth=new Date(y,m+1,1);renderCal()}});
+ box.append(el('div',{className:'calhead'},[prev,el('strong',{textContent:calMonth.toLocaleDateString('de-DE',{month:'long',year:'numeric'})}),next]));
+ const g=el('div',{className:'grid'});
+ for(const w of ['Mo','Di','Mi','Do','Fr','Sa','So'])g.append(el('div',{className:'wd',textContent:w}));
+ const offset=(new Date(y,m,1).getDay()+6)%7;for(let i=0;i<offset;i++)g.append(el('div'));
+ const days=new Date(y,m+1,0).getDate(),todayK=dayKey(Date.now());
+ for(let d=1;d<=days;d++){const k=dayKey(new Date(y,m,d));const es=db.entries.filter(e=>dayKey(e.ts)===k);
+  const b=el('button',{textContent:d});const cls=[];if(k===todayK)cls.push('today');
+  if(es.length){const ms=es.filter(e=>e.mood).map(e=>e.mood);
+   if(ms.length){const r=Math.round(ms.reduce((a,c)=>a+c,0)/ms.length);b.style.background=moodColor(r);cls.push('has');if(MOODS[r-1].light)cls.push('lightday')}
+   else b.style.background='var(--line)';
+   b.ariaLabel=`${d}. – ${es.length} Eintrag${es.length>1?'e':''}`}
+  b.className=cls.join(' ');b.setAttribute('aria-pressed',selDay===k);
+  b.onclick=()=>{selDay=selDay===k?null:k;renderCal();renderList()};g.append(b)}
+ box.append(g);
+ const dl=$('dayline');dl.replaceChildren();
+ if(selDay){const[yy,mm,dd]=selDay.split('-').map(Number);
+  dl.append(el('div',{className:'dayline'},[el('strong',{textContent:new Date(yy,mm-1,dd).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})}),
+   el('button',{className:'del',textContent:'Alle zeigen',onclick:()=>{selDay=null;renderCal();renderList()}})]))}}
+
+// Kategorien verwalten
+function renderCats(){const box=$('cats');box.replaceChildren();for(const c of db.cats){
+ const kw=el('input',{value:c.kw.join(', '),placeholder:'Stichworte'});
+ kw.onchange=()=>{c.kw=kw.value.split(',').map(s=>s.trim()).filter(Boolean);save();renderDraftChips()};
+ box.append(el('div',{className:'cat'},[el('div',{className:'row'},[el('strong',{textContent:c.name,style:'flex:1'}),
+  el('button',{className:'del',textContent:'Entfernen',onclick:()=>{if(confirm(`Kategorie „${c.name}" entfernen? Alte Einträge behalten sie.`)){db.cats=db.cats.filter(x=>x!==c);save();renderAll()}}})]),kw]))}}
+$('addCat').onclick=()=>{const n=$('newCat').value.trim();if(!n||db.cats.some(c=>c.name.toLowerCase()===n.toLowerCase()))return;
+ db.cats.push({name:n,kw:[]});$('newCat').value='';save();renderAll()};
+
+// Sicherung
+function b64(u){let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s)}
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function keyFrom(pw,salt){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+ return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+const bmsg=t=>$('backupMsg').textContent=t;
+$('exportBtn').onclick=async()=>{const pw=$('pw').value;if(pw.length<8)return bmsg('Das Passwort braucht mindestens 8 Zeichen.');
+ if(!crypto.subtle)return bmsg('Verschlüsselung geht nur, wenn die App über https geöffnet ist.');
+ const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+ const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await keyFrom(pw,salt),new TextEncoder().encode(JSON.stringify({entries:db.entries,cats:db.cats}))));
+ const name=`hj-${new Date().toISOString().slice(0,10)}.json`;
+ const file=new File([JSON.stringify({v:1,salt:b64(salt),iv:b64(iv),data:b64(ct)})],name,{type:'application/json'});
+ try{if(navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file]});
+  else{const a=el('a',{href:URL.createObjectURL(file),download:name});a.click()}
+  db.lastExport=Date.now();save();bmsg('Gesichert.');renderWarn()}catch(e){bmsg('Sicherung abgebrochen.')}};
+$('importBtn').onclick=()=>{if($('pw').value.length<8)return bmsg('Gib zuerst das Passwort der Sicherung ein.');$('file').click()};
+$('file').onchange=async()=>{const f=$('file').files[0];$('file').value='';if(!f)return;
+ try{const j=JSON.parse(await f.text());
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(j.iv)},await keyFrom($('pw').value,unb64(j.salt)),unb64(j.data));
+  const d=JSON.parse(new TextDecoder().decode(pt));const ids=new Set(db.entries.map(e=>e.id));
+  const neu=d.entries.filter(e=>!ids.has(e.id));db.entries.push(...neu);
+  for(const c of d.cats)if(!db.cats.some(x=>x.name===c.name))db.cats.push(c);
+  save();renderAll();bmsg(`${neu.length} Einträge geladen.`)}catch(e){bmsg('Passwort falsch oder Datei beschädigt.')}};
+
+// Hinweise
+function renderWarn(){const w=$('warn');w.replaceChildren();
+ if(!storageOk){w.append(el('div',{className:'banner',textContent:'In dieser Vorschau wird nichts dauerhaft gespeichert. Auf dem iPhone über den Homescreen schon.'}));return}
+ const days=db.lastExport?Math.floor((Date.now()-db.lastExport)/864e5):null;
+ if(db.entries.length&&(days===null||days>=7)){const b=el('div',{className:'banner'},[days===null?'Du hast noch keine Sicherung. ':`Letzte Sicherung ${rel(db.lastExport)}. `,
+  el('button',{className:'del',textContent:'Jetzt sichern',style:'color:inherit',onclick:()=>{$('backup').open=true;$('pw').focus()}})]);w.append(b)}}
+
+function renderAll(){renderMoods();renderTod();renderDraftChips();renderBand();renderFilters();renderCal();renderList();renderCats();renderWarn()}
+renderAll();
+
+// Offline-Modus
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
